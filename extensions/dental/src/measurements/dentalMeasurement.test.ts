@@ -8,10 +8,21 @@ describe('dental measurement records', () => {
         uid: 'annotation-1',
         toolName: 'Length',
         data: { image: { length: 12.4, unit: 'mm' } },
+        metadata: {
+          referencedImageId: 'wadors:image-1',
+          FrameOfReferenceUID: 'frame-1',
+        },
       },
       preset: getDentalMeasurementPreset('pa-length'),
       toothId: 'permanent-1',
       note: 'Distal root',
+      viewReference: {
+        FrameOfReferenceUID: 'frame-1',
+        referencedImageId: 'wadors:image-1',
+        cameraFocalPoint: new Float32Array([1, 2, 3]),
+        viewPlaneNormal: new Float32Array([0, 0, 1]),
+        viewUp: new Float32Array([0, -1, 0]),
+      },
       createdAt: '2026-06-18T00:00:00.000Z',
     });
 
@@ -22,6 +33,13 @@ describe('dental measurement records', () => {
         unit: 'mm',
         value: 12.4,
         note: 'Distal root',
+        referencedImageId: 'wadors:image-1',
+        FrameOfReferenceUID: 'frame-1',
+        viewReference: expect.objectContaining({
+          cameraFocalPoint: [1, 2, 3],
+          viewPlaneNormal: [0, 0, 1],
+          viewUp: [0, -1, 0],
+        }),
       })
     );
   });

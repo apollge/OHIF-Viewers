@@ -37,22 +37,15 @@ function DentalViewerLayout({
   const [appConfig] = useAppConfig();
   const { panelService, hangingProtocolService, customizationService } = servicesManager.services;
   const [showLoadingIndicator, setShowLoadingIndicator] = useState(appConfig.showLoadingIndicator);
-  const {
-    preferences,
-    setSelectedToothId,
-    setNumberingSystem,
-    applyPreferences,
-    toggleTheme,
-  } = useDentalPreferences();
-  const {
-    status: dentalViewerStateStatus,
-    lastError: dentalViewerStateError,
-  } = useDentalViewerState({
-    appConfig,
-    servicesManager,
-    preferences,
-    applyPreferences,
-  });
+  const { preferences, setSelectedToothId, setNumberingSystem, applyPreferences, toggleTheme } =
+    useDentalPreferences();
+  const { status: dentalViewerStateStatus, lastError: dentalViewerStateError } =
+    useDentalViewerState({
+      appConfig,
+      servicesManager,
+      preferences,
+      applyPreferences,
+    });
   const { armPreset } = useDentalMeasurements({
     appConfig,
     commandsManager,
@@ -60,9 +53,10 @@ function DentalViewerLayout({
     preferences,
   });
 
-  const hasPanels = useCallback((side): boolean => !!panelService.getPanels(side).length, [
-    panelService,
-  ]);
+  const hasPanels = useCallback(
+    (side): boolean => !!panelService.getPanels(side).length,
+    [panelService]
+  );
 
   const [hasRightPanels, setHasRightPanels] = useState(hasPanels('right'));
   const [hasLeftPanels, setHasLeftPanels] = useState(hasPanels('left'));
@@ -161,10 +155,10 @@ function DentalViewerLayout({
       />
       <div
         className={VIEWER_BODY_CLASS_BY_THEME[preferences.theme]}
-        style={{ height: 'calc(100vh - 56px)' }}
+        style={{ height: 'calc(100vh - 96px)' }}
       >
         {showLoadingIndicator ? (
-          <LoadingIndicatorProgress className="h-full w-full bg-background" />
+          <LoadingIndicatorProgress className="bg-background h-full w-full" />
         ) : null}
         <div className="flex h-full w-full flex-row overflow-hidden">
           {hasLeftPanels ? (
@@ -178,7 +172,7 @@ function DentalViewerLayout({
             />
           ) : null}
           <div className="flex h-full min-w-0 flex-1 flex-col">
-            <div className="relative flex h-full flex-1 items-center justify-center overflow-hidden bg-background">
+            <div className="bg-background relative flex h-full flex-1 items-center justify-center overflow-hidden">
               <ViewportGridComp
                 servicesManager={servicesManager}
                 viewportComponents={viewportComponents}

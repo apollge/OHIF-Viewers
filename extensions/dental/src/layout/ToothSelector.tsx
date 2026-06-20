@@ -18,7 +18,7 @@ import {
 } from '../tooth/toothIdentity';
 
 const TOOTH_SELECTOR_TRIGGER_CLASS =
-  'bg-transparent text-foreground/80 hover:bg-background hover:text-highlight flex h-10 w-[280px] items-center justify-between gap-2 rounded-lg px-2 text-xs';
+  'bg-transparent text-foreground/80 hover:bg-background hover:text-highlight flex h-10 w-[150px] items-center justify-between gap-2 rounded-lg px-2 text-xs xl:w-[210px] 2xl:w-[280px]';
 
 const NUMBERING_BUTTON_CLASS = 'h-8 px-2 text-xs';
 
