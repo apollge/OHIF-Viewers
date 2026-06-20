@@ -108,7 +108,20 @@ describe('Dental backend API', () => {
         viewportId: 'dental-current',
         displaySetInstanceUID: 'display-set-1',
         referenceSeriesUID: 'series-1',
-        points: [[1, 2, 3], [4, 5, 6]],
+        referencedImageId: 'wadors:image-1',
+        FrameOfReferenceUID: 'frame-1',
+        viewReference: {
+          FrameOfReferenceUID: 'frame-1',
+          referencedImageId: 'wadors:image-1',
+          sliceIndex: 0,
+          cameraFocalPoint: [1, 2, 3],
+          viewPlaneNormal: [0, 0, 1],
+          viewUp: [0, -1, 0],
+        },
+        points: [
+          [1, 2, 3],
+          [4, 5, 6],
+        ],
         metadata: { source: 'preset' },
       },
     });
@@ -135,7 +148,20 @@ describe('Dental backend API', () => {
         viewportId: 'dental-current',
         displaySetInstanceUID: 'display-set-1',
         referenceSeriesUID: 'series-1',
-        points: [[1, 2, 3], [4, 5, 6]],
+        referencedImageId: 'wadors:image-1',
+        FrameOfReferenceUID: 'frame-1',
+        viewReference: {
+          FrameOfReferenceUID: 'frame-1',
+          referencedImageId: 'wadors:image-1',
+          sliceIndex: 0,
+          cameraFocalPoint: [1, 2, 3],
+          viewPlaneNormal: [0, 0, 1],
+          viewUp: [0, -1, 0],
+        },
+        points: [
+          [1, 2, 3],
+          [4, 5, 6],
+        ],
       })
     );
     expect(parse(listed).measurements).toHaveLength(1);
@@ -184,6 +210,11 @@ describe('Dental backend API', () => {
         label: 'Root length',
         value: 18,
         unit: 'mm',
+        viewReference: {
+          FrameOfReferenceUID: 'frame-1',
+          referencedImageId: 'wadors:image-1',
+          sliceIndex: 0,
+        },
       },
     });
     persistentStore.close();
@@ -194,6 +225,11 @@ describe('Dental backend API', () => {
 
     expect(parse(state).state.selectedToothId).toBe('FDI-11');
     expect(parse(measurements).measurements[0].label).toBe('Root length');
+    expect(parse(measurements).measurements[0].viewReference).toEqual({
+      FrameOfReferenceUID: 'frame-1',
+      referencedImageId: 'wadors:image-1',
+      sliceIndex: 0,
+    });
 
     reopenedStore.close();
   });

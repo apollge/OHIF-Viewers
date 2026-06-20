@@ -21,6 +21,9 @@ function rowToMeasurement(record) {
     viewportId: record.viewport_id,
     displaySetInstanceUID: record.display_set_instance_uid,
     referenceSeriesUID: record.reference_series_uid,
+    referencedImageId: record.referenced_image_id,
+    FrameOfReferenceUID: record.frame_of_reference_uid,
+    viewReference: record.view_reference_json ? JSON.parse(record.view_reference_json) : undefined,
     points: record.geometry_json ? JSON.parse(record.geometry_json) : undefined,
     metadata: record.metadata_json ? JSON.parse(record.metadata_json) : {},
     createdAt: record.created_at,
@@ -82,6 +85,9 @@ class DentalSQLiteStore {
     this.ensureMeasurementColumn('viewport_id', 'TEXT');
     this.ensureMeasurementColumn('display_set_instance_uid', 'TEXT');
     this.ensureMeasurementColumn('reference_series_uid', 'TEXT');
+    this.ensureMeasurementColumn('referenced_image_id', 'TEXT');
+    this.ensureMeasurementColumn('frame_of_reference_uid', 'TEXT');
+    this.ensureMeasurementColumn('view_reference_json', 'TEXT');
     this.ensureMeasurementColumn('geometry_json', 'TEXT');
   }
 
@@ -135,7 +141,8 @@ class DentalSQLiteStore {
         `
       SELECT id, study_instance_uid, preset_id, label, value, unit, tool_name, annotation_uid,
              tooth_id, notes, viewport_id, display_set_instance_uid, reference_series_uid,
-             geometry_json, metadata_json, created_at, updated_at
+             referenced_image_id, frame_of_reference_uid, view_reference_json, geometry_json,
+             metadata_json, created_at, updated_at
       FROM dental_measurements
       WHERE user_id = ? AND study_instance_uid = ?
       ORDER BY created_at DESC
@@ -171,9 +178,10 @@ class DentalSQLiteStore {
       INSERT INTO dental_measurements (
         id, user_id, study_instance_uid, preset_id, label, value, unit, tool_name,
         annotation_uid, tooth_id, notes, viewport_id, display_set_instance_uid,
-        reference_series_uid, geometry_json, metadata_json, created_at, updated_at
+        reference_series_uid, referenced_image_id, frame_of_reference_uid, view_reference_json,
+        geometry_json, metadata_json, created_at, updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         preset_id = excluded.preset_id,
         label = excluded.label,
@@ -186,6 +194,9 @@ class DentalSQLiteStore {
         viewport_id = excluded.viewport_id,
         display_set_instance_uid = excluded.display_set_instance_uid,
         reference_series_uid = excluded.reference_series_uid,
+        referenced_image_id = excluded.referenced_image_id,
+        frame_of_reference_uid = excluded.frame_of_reference_uid,
+        view_reference_json = excluded.view_reference_json,
         geometry_json = excluded.geometry_json,
         metadata_json = excluded.metadata_json,
         updated_at = excluded.updated_at
@@ -206,6 +217,9 @@ class DentalSQLiteStore {
         record.viewportId,
         record.displaySetInstanceUID,
         record.referenceSeriesUID,
+        record.referencedImageId,
+        record.FrameOfReferenceUID,
+        record.viewReference ? JSON.stringify(record.viewReference) : null,
         record.points ? JSON.stringify(record.points) : null,
         JSON.stringify(record.metadata),
         record.createdAt,

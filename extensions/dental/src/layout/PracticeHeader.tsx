@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Button, IconPresentationProvider, Icons, ToolButton } from '@ohif/ui-next';
-import { useSystem } from '@ohif/core';
+import { Button, IconPresentationProvider, Icons, ToolButton, useModal } from '@ohif/ui-next';
+import { Types, useSystem } from '@ohif/core';
 import { Toolbar, usePatientInfo } from '@ohif/extension-default';
 import { preserveQueryParameters } from '@ohif/app';
 
@@ -15,8 +15,8 @@ import { formatHeaderValue, getPracticeName, getStudySummary } from './practiceH
 import ToothSelector from './ToothSelector';
 
 const HEADER_CLASS_BY_THEME = {
-  dental: 'relative h-[56px] w-full border-b border-[#24a78d] bg-[#10201c] px-3',
-  standard: 'bg-background border-muted relative h-[56px] w-full border-b px-3',
+  dental: 'h-[96px] w-full border-b border-[#24a78d] bg-[#10201c] px-3',
+  standard: 'bg-background border-muted h-[96px] w-full border-b px-3',
 };
 
 const PRACTICE_NAME_CLASS_BY_THEME = {
@@ -70,7 +70,8 @@ function PracticeHeader({
   onSelectMeasurementPreset,
 }: PracticeHeaderProps) {
   const { servicesManager, extensionManager, commandsManager } = useSystem();
-  const { displaySetService } = servicesManager.services;
+  const { customizationService, displaySetService } = servicesManager.services;
+  const { show } = useModal();
   const { patientInfo } = usePatientInfo();
   const navigate = useNavigate();
   const location = useLocation();
@@ -121,6 +122,22 @@ function PracticeHeader({
     });
   };
 
+  const onClickSettings = () => {
+    const UserPreferencesModal = customizationService.getCustomization(
+      'ohif.userPreferencesModal'
+    ) as Types.MenuComponentCustomization;
+
+    if (!UserPreferencesModal) {
+      return;
+    }
+
+    show({
+      content: UserPreferencesModal,
+      title: UserPreferencesModal.title ?? 'User preferences',
+      containerClassName: UserPreferencesModal.containerClassName ?? 'flex max-w-4xl p-6 flex-col',
+    });
+  };
+
   return (
     <IconPresentationProvider
       size="large"
@@ -130,38 +147,29 @@ function PracticeHeader({
         className={HEADER_CLASS_BY_THEME[preferences.theme]}
         data-cy="dental-practice-header"
       >
-        <div className="absolute left-3 top-1/2 flex min-w-[260px] -translate-y-1/2 items-center gap-2">
-          {appConfig.showStudyList ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-primary hover:bg-muted"
-              data-cy="return-to-work-list"
-              onClick={onClickReturnButton}
-            >
-              <Icons.ArrowLeft className="h-6 w-6" />
-            </Button>
-          ) : null}
-          <div className="flex min-w-0 flex-col">
-            <span className={PRACTICE_NAME_CLASS_BY_THEME[preferences.theme]}>
-              {practiceName}
-            </span>
-            <span className={MODE_LABEL_CLASS_BY_THEME[preferences.theme]}>
-              Dental Mode
-            </span>
+        <div className="grid h-11 grid-cols-[minmax(180px,1fr)_minmax(180px,auto)_minmax(0,1fr)] items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            {appConfig.showStudyList ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-primary hover:bg-muted flex-shrink-0"
+                data-cy="return-to-work-list"
+                onClick={onClickReturnButton}
+              >
+                <Icons.ArrowLeft className="h-6 w-6" />
+              </Button>
+            ) : null}
+            <div className="flex min-w-0 flex-col">
+              <span className={PRACTICE_NAME_CLASS_BY_THEME[preferences.theme]}>
+                {practiceName}
+              </span>
+              <span className={MODE_LABEL_CLASS_BY_THEME[preferences.theme]}>Dental Mode</span>
+            </div>
           </div>
-        </div>
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform">
-          <div className="relative flex items-center justify-center gap-[4px]">
-            <Toolbar buttonSection="primary" />
-            <DentalMeasurementsPalette onSelectPreset={onSelectMeasurementPreset} />
-          </div>
-        </div>
-
-        <div className="absolute right-3 top-1/2 flex max-w-[calc(50vw-260px)] -translate-y-1/2 select-none items-center justify-end gap-2 overflow-hidden">
           <div
-            className="hidden w-[220px] min-w-0 flex-shrink flex-col text-right lg:flex"
+            className="hidden min-w-0 max-w-[280px] flex-col text-center lg:flex"
             data-cy="dental-patient-summary"
           >
             <span className="text-foreground truncate text-[13px] font-semibold">
@@ -174,10 +182,10 @@ function PracticeHeader({
             </span>
           </div>
 
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 items-center justify-end gap-1 overflow-hidden xl:gap-2">
             {stateStatusText ? (
               <span
-                className="border-muted text-muted-foreground hidden h-7 max-w-[96px] items-center truncate rounded border px-2 text-[11px] xl:flex"
+                className="border-muted text-muted-foreground hidden h-7 max-w-[96px] items-center truncate rounded border px-2 text-[11px] 2xl:flex"
                 data-cy="dental-viewer-state-status"
                 title={stateStatusText}
               >
@@ -190,46 +198,59 @@ function PracticeHeader({
               onSelectedToothChange={onSelectedToothChange}
               onNumberingSystemChange={onNumberingSystemChange}
             />
-          </div>
 
-          <Button
-            variant={isDentalTheme ? 'default' : 'ghost'}
-            className="h-9 px-2 text-xs"
-            data-cy="dental-theme-toggle"
-            onClick={onThemeToggle}
-          >
-            {isDentalTheme ? 'Dental' : 'Theme'}
-          </Button>
-
-          <div className="text-primary flex cursor-pointer items-center">
             <Button
-              variant="ghost"
-              className="hover:bg-muted"
-              data-cy="undo-btn"
-              onClick={() => commandsManager.run('undo')}
+              variant={isDentalTheme ? 'default' : 'ghost'}
+              className="h-9 flex-shrink-0 px-2 text-xs"
+              data-cy="dental-theme-toggle"
+              onClick={onThemeToggle}
             >
-              <Icons.Undo />
-            </Button>
-            <Button
-              variant="ghost"
-              className="hover:bg-muted"
-              data-cy="redo-btn"
-              onClick={() => commandsManager.run('redo')}
-            >
-              <Icons.Redo />
+              {isDentalTheme ? 'Dental' : 'Theme'}
             </Button>
           </div>
+        </div>
 
-          <div className="border-muted mx-1.5 h-[25px] border-r" />
+        <div className="border-muted/50 grid h-[51px] grid-cols-[1fr_auto_1fr] items-center border-t">
+          <div />
+          <div className="flex min-w-0 items-center justify-center gap-1 overflow-hidden">
+            <Toolbar buttonSection="primary" />
+            <DentalMeasurementsPalette onSelectPreset={onSelectMeasurementPreset} />
+          </div>
+          <div className="flex items-center justify-end">
+            <div className="text-primary flex cursor-pointer items-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-muted"
+                data-cy="undo-btn"
+                onClick={() => commandsManager.run('undo')}
+              >
+                <Icons.Undo />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hover:bg-muted"
+                data-cy="redo-btn"
+                onClick={() => commandsManager.run('redo')}
+              >
+                <Icons.Redo />
+              </Button>
+            </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-primary hover:bg-muted"
-            data-cy="dental-header-settings"
-          >
-            <Icons.GearSettings />
-          </Button>
+            <div className="border-muted mx-1.5 h-[25px] border-r" />
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-primary hover:bg-muted"
+              data-cy="dental-header-settings"
+              aria-label="Open user preferences"
+              onClick={onClickSettings}
+            >
+              <Icons.GearSettings />
+            </Button>
+          </div>
         </div>
       </header>
     </IconPresentationProvider>

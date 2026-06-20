@@ -66,7 +66,11 @@ async function handleDentalRequest({ method, url, headers, body }, { store, conf
 
     if (method === 'GET') {
       const state = await store.getViewerState(session.userId, studyInstanceUID);
-      return json(200, { studyInstanceUID, state: state?.state || null, updatedAt: state?.updatedAt || null });
+      return json(200, {
+        studyInstanceUID,
+        state: state?.state || null,
+        updatedAt: state?.updatedAt || null,
+      });
     }
 
     if (method === 'PUT') {
@@ -109,6 +113,12 @@ async function handleDentalRequest({ method, url, headers, body }, { store, conf
         viewportId: payload.viewportId || null,
         displaySetInstanceUID: payload.displaySetInstanceUID || null,
         referenceSeriesUID: payload.referenceSeriesUID || null,
+        referencedImageId: payload.referencedImageId || null,
+        FrameOfReferenceUID: payload.FrameOfReferenceUID || null,
+        viewReference:
+          payload.viewReference && typeof payload.viewReference === 'object'
+            ? payload.viewReference
+            : null,
         points: Array.isArray(payload.points) ? payload.points : undefined,
         metadata: payload.metadata || {},
         createdAt: payload.createdAt,

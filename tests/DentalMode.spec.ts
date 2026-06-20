@@ -56,6 +56,10 @@ test('opens Dental Mode and exposes its critical workflow surfaces', async ({ pa
   await expect(page.getByTestId('dental-numbering-system-universal')).toBeVisible();
   await expect(page.getByTestId('dental-selected-tooth')).toBeVisible();
 
+  await page.getByTestId('dental-header-settings').click();
+  await expect(page.getByText('User preferences', { exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
+
   await expect(page.getByTestId('viewport-grid')).toBeVisible();
   await expect(page.locator('[data-viewportid="dental-current"]')).toBeAttached();
   await expect(page.getByTestId('dental-no-prior-placeholder')).toBeVisible();

@@ -55,6 +55,7 @@ import { isMeasurementWithinViewport } from './utils/isMeasurementWithinViewport
 import { getCenterExtent } from './utils/getCenterExtent';
 import { EasingFunctionEnum } from './utils/transitions';
 import { createSegmentationForViewport } from './utils/createSegmentationForViewport';
+import hydrateAnnotationForViewport from './utils/hydrateAnnotationForViewport';
 import { utilities as segmentationUtilities } from '@cornerstonejs/tools/segmentation';
 import i18n from '@ohif/i18n';
 
@@ -221,6 +222,13 @@ function commandsModule({
   };
 
   const actions = {
+    hydrateAnnotationForViewport: ({ annotationData, viewportId }) =>
+      hydrateAnnotationForViewport({
+        annotationData,
+        viewportId,
+        cornerstoneViewportService,
+      }),
+
     jumpToMeasurementViewport: ({ annotationUID, measurement }) => {
       cornerstoneTools.annotation.selection.setAnnotationSelected(annotationUID, true);
       const { metadata } = measurement;
@@ -2810,6 +2818,7 @@ function commandsModule({
     loadSegmentationDisplaySetsForViewport: actions.loadSegmentationDisplaySetsForViewport,
     setViewportOrientation: actions.setViewportOrientation,
     hydrateSecondaryDisplaySet: actions.hydrateSecondaryDisplaySet,
+    hydrateAnnotationForViewport: actions.hydrateAnnotationForViewport,
     getVolumeIdForDisplaySet: actions.getVolumeIdForDisplaySet,
     triggerCreateAnnotationMemo: actions.triggerCreateAnnotationMemo,
     startRecordingForAnnotationGroup: actions.startRecordingForAnnotationGroup,

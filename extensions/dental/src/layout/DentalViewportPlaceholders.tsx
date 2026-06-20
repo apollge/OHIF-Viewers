@@ -21,22 +21,18 @@ const PLACEHOLDERS: PlaceholderDefinition[] = [
   {
     viewportId: 'dental-bitewing-left',
     label: 'Bitewing Placeholder',
-    description: 'Static MVP placeholder. Bitewing image matching is not enabled.',
+    description: 'Static placeholder. Bitewing image matching is not enabled.',
     dataCy: 'dental-bitewing-placeholder-left',
   },
   {
     viewportId: 'dental-bitewing-right',
     label: 'Bitewing Placeholder',
-    description: 'Static MVP placeholder. Bitewing image matching is not enabled.',
+    description: 'Static placeholder. Bitewing image matching is not enabled.',
     dataCy: 'dental-bitewing-placeholder-right',
   },
 ];
 
-function DentalViewportPlaceholder({
-  placeholder,
-}: {
-  placeholder: PlaceholderDefinition;
-}) {
+function DentalViewportPlaceholder({ placeholder }: { placeholder: PlaceholderDefinition }) {
   const [viewportGrid] = useViewportGrid();
   const viewport = viewportGrid.viewports.get(placeholder.viewportId);
 
